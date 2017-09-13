@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">VerticalSwitchTextView</string>
+    <string name="ellipsis">\u2026</string>
+</resources>
