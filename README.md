@@ -7,3 +7,5 @@
 
 文字如果没有超过控件宽度，自动居中对齐，只上下切换，不向左滚动。
 
+
+![image](https://github.com/wanglu123run/VerticalSwitchTextView-master/blob/master/2018-01-04_18_04_19.gif)   
