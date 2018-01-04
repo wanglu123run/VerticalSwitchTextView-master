@@ -12,7 +12,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -93,12 +92,12 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
 
     private boolean isHorizontalPlay=false;//是否可以横向播放
 
-    private void init() {
+    public void init() {
         setOnClickListener(this);
         mPaint = getPaint();
-        mPaint.setTextAlign(Paint.Align.CENTER);
+        mPaint.setTextAlign(Paint.Align.CENTER);//以中心为基点
         ellipsis = getContext().getString(R.string.ellipsis);
-        ellipsisLen = mPaint.measureText(ellipsis);//根据样式，测量这三个点的宽度
+        ellipsisLen = mPaint.measureText(ellipsis);// 测量这三个点的宽度
         mEllipsize = getEllipsize();
 
         animator = ValueAnimator.ofFloat(0f, 1f).setDuration(switchDuaration);
@@ -117,7 +116,6 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
             public void onAnimationStart(Animator animation) {
                 isHorizontalPlay=false;
                 endGun();
-//                Log.e("VerticalSwitchTextView", "-----------------onAnimationStart-------------------");
             }
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -157,11 +155,7 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
         if (lists == null || lists.size() == 0) {
             return;
         }
-        contentSize = lists.size();
-
-        if (contentSize > 1) {
-            animator.start();
-        }
+        initParams();
     }
 
     private void generateEllipsisText() {
@@ -255,8 +249,6 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
         if (mEllipsize != null) {
             generateEllipsisText();
         }
-
-        startGun();
         outStr = lists.get(0);
         if (contentSize > 1) {
             inStr = lists.get(1);
@@ -273,6 +265,8 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
         textBaseY = mHeight - (mHeight - fontHeight) / 2 - fontMetrics.bottom;
 
         setMeasuredDimension(mWidth, mHeight);
+        Log.e("","----------------------onMeasure");
+        startGun();
     }
 
     @Override
@@ -284,7 +278,31 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
         //计算绘制的文字中心位置
         switch (alignment) {
             case TEXT_ALIGN_CENTER:
-                inTextCenterX = outTextCenterX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+//                inTextCenterX = outTextCenterX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                /*if (mTextWidth < mWidth) {
+                    //窄文本 居中
+                    inTextCenterX = outTextCenterX  = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                } else {
+                    //宽文本 左靠齐
+                    inTextCenterX = paddingLeft + mPaint.measureText(inStr) / 2;
+                    outTextCenterX = paddingLeft + mPaint.measureText(outStr) / 2;
+                }*/
+
+                //先算进入的字符串
+                if (mPaint.measureText(outStr) < mWidth) {
+                    //居中
+                    outTextCenterX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                } else {
+                    //靠左
+                    outTextCenterX = paddingLeft + mPaint.measureText(outStr) / 2;
+                }
+                if (mPaint.measureText(inStr) < mWidth) {
+                    //居中
+                    inTextCenterX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                } else {
+                    //靠左
+                    inTextCenterX = paddingLeft + mPaint.measureText(inStr) / 2;
+                }
                 break;
             case TEXT_ALIGN_LEFT:
                 inTextCenterX = paddingLeft + mPaint.measureText(inStr) / 2;
@@ -306,7 +324,7 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
                 /**
                  * 注释的是原始版的位置控制，原始版在垂直滚动时，会先将水平滚动的字归位之后再垂直滚
                  */
-               /* if (verticalOffset > 0) {
+                /*if (verticalOffset > 0) {
                     canvas.drawText(outStr, outTextCenterX, verticalOffset, mPaint);
                 } else {
                     canvas.drawText(inStr, inTextCenterX, 2 * textBaseY + verticalOffset, mPaint);
@@ -339,11 +357,56 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
     private float mCoordinateX = 1280;//当前滚动位置
     private float mTextWidth;//文本宽度
     private int mScrollWidth = 1280;//滚动区域宽度
-    private int speed = 1;//滚动速度
+    private int speed = 1;//滚动速度  在initParams方法中设置
     private String currentStr = "";//当前的文字
 
     private float startX;//最初开始x坐标
     private float resstartX;//重新开始的x坐标 从最右边开始进入的坐标
+
+
+    /**
+     * 初始化参数
+     */
+    public void initParams() {
+        if (animator != null) {
+            animator.cancel();
+        }
+        endGun();
+//        animator=null;
+//        mEllipsize=null;
+        outStr="";//当前滑出的文本内容
+        inStr="";//当前滑入的文本内容
+        textBaseY=0;//文本显示的baseline
+        currentIndex = 0;//当前显示到第几个文本
+        ellipsis="";
+        ellipsisLen = 0;
+        mCoordinateX=1280;
+        mTextWidth=0;
+        mScrollWidth=0;
+        speed=1;
+        currentStr="";
+        startX=0;
+        resstartX=0;
+//        新加的
+        switchOrientation=0;
+
+        //一些参数
+        inTextCenterX=0;
+        outTextCenterX=0;
+        currentAnimatedValue = 0.0f;
+        verticalOffset=0;
+        mWidth=0;
+        mHeight=0;
+        paddingLeft=0;
+        paddingBottom=0;
+        paddingTop=0;
+        paddingRight=0;
+        requestLayout();
+        contentSize = lists.size();
+        if (contentSize > 1) {
+            animator.start();
+        }
+    }
 
 
     /**
@@ -356,10 +419,49 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
     }
 
     protected void startGun() {
+        if (lists == null || lists.size() == 0) {
+            return;
+        }
+        Log.e("","123--------------startGun---------------");
         initHorizontal();
-        switch (alignment) {
+        if(TextUtils.isEmpty(currentStr)){
+            return;
+        }
+        /*switch (alignment) {
             case TEXT_ALIGN_CENTER:
                 mCoordinateX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                break;
+            case TEXT_ALIGN_LEFT:
+                mCoordinateX = paddingLeft + mTextWidth / 2;
+                break;
+            case TEXT_ALIGN_RIGHT:
+                mCoordinateX = mWidth - paddingRight - mTextWidth / 2;
+                break;
+        }*/
+        switch (alignment) {
+            case TEXT_ALIGN_CENTER:
+               /* if (mTextWidth <= mScrollWidth) {
+                    //窄文本
+                    mCoordinateX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                } else {
+                    //宽文本
+                    mCoordinateX = paddingLeft + mTextWidth / 2;
+                }*/
+
+                if (mPaint.measureText(currentStr) < mWidth) {
+                    //居中
+                    mCoordinateX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                } else {
+                    //靠左
+                    mCoordinateX = paddingLeft + mPaint.measureText(outStr) / 2;
+                }
+                /*if (mPaint.measureText(inStr) < mWidth) {
+                    //居中
+                    inTextCenterX = (mWidth - paddingLeft - paddingRight) / 2 + paddingLeft;
+                } else {
+                    //靠左
+                    inTextCenterX = paddingLeft + mPaint.measureText(inStr) / 2;
+                }*/
                 break;
             case TEXT_ALIGN_LEFT:
                 mCoordinateX = paddingLeft + mTextWidth / 2;
@@ -376,8 +478,10 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
         if (TextUtils.isEmpty(currentStr)||mTextWidth<=mScrollWidth) {//文本宽度小于控件宽度则不滚动
             return;
         }
-        if (!TextUtils.isEmpty(currentStr))
-            mHandler.sendEmptyMessageDelayed(0, 1000);
+        if (mHandler.hasMessages(0)){
+            mHandler.removeMessages(0);
+        }
+        mHandler.sendEmptyMessageDelayed(0, 1000);
     }
 
     protected void endGun() {
@@ -391,6 +495,8 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+//            Log.e("","-------------handleMessage---------speed:"+speed);
             switch (msg.what) {
                 case 0:
                     if (mCoordinateX < (-startX)) {//文字滚动完了，从滚动区域的右边出来   -927
@@ -408,7 +514,6 @@ public class VerticalSwitchTextView extends TextView implements View.OnClickList
                     }
                     break;
             }
-            super.handleMessage(msg);
         }
     };
 

@@ -26,7 +26,14 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> list = new ArrayList<String>(
                 Arrays.asList(
                         "1开始1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30end",
-                        "2开始1-2-3-4-5-end"
+                        "2开始1-2-3-4-5-end开始1-2-3-4-5-end开始1-2-3-4-5-end开始1-2-3-4-5-end开始1-2-3-4-5-end开始1-2-3-4-5-end",
+                        "3开始1-2-3-4-5-end开始1-2-3-4-5-end开始1-2-3-4-5-end开始1-2-3-4-5-end开始1-2-3-4-5-end",
+                        "4开始1-2-3-4-5-end",
+                        "5开始1-2-3-4-5-end",
+                        "6开始1-2-3-4-5-end",
+                        "7开始1-2-3-4-5-end",
+                        "8开始1-2-3-4-5-end",
+                        "9开始1-2-3-4-5-end"
                 ));
         VerticalSwitchTextView verticalSwitchTextView1 = (VerticalSwitchTextView) findViewById(R.id.vertical_switch_textview1);
 //        VerticalSwitchTextView verticalSwitchTextView2 = (VerticalSwitchTextView) findViewById(R.id.vertical_switch_textview2);

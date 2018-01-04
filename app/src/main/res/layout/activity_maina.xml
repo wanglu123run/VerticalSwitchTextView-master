@@ -22,13 +22,16 @@
 
     <com.viclee.verticalswitchtextview.VerticalSwitchTextView
         android:id="@+id/vertical_switch_textview1"
+        android:background="#656665"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#aa0090"
-        android:textSize="30sp"
-        android:padding="8dp"
-        android:background="#999999"
-        vswitch:alignment="left"
+        android:layout_height="15dp"
+        android:layout_marginTop="-3dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:textColor="#fff"
+        android:textSize="12sp"
+        vswitch:alignment="center"
         vswitch:switchDuaration = "800"
         vswitch:idleDuaration = "5000"
         vswitch:switchOrientation="up"/>
